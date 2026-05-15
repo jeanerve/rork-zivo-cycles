@@ -187,6 +187,41 @@ export interface DisciplineInfo {
   totalPayments: number;
 }
 
+export type InsightType = 'streak' | 'milestone' | 'spending' | 'encouragement' | 'tip' | 'goal';
+
+export interface AIInsight {
+  id: string;
+  text: string;
+  type: InsightType;
+  emoji?: string;
+  createdAt: string;
+}
+
+export type ChallengeType = 'no_spend' | 'daily_save' | 'student' | 'emergency_fund' | 'custom';
+
+export interface Challenge {
+  id: string;
+  title: string;
+  description: string;
+  type: ChallengeType;
+  durationDays: number;
+  targetAmount?: number;
+  dailyAmount?: number;
+  participants: number;
+  emoji: string;
+  color: string;
+}
+
+export interface UserChallenge {
+  id: string;
+  challengeId: string;
+  joinedAt: string;
+  completedAt?: string;
+  progress: number;
+  status: 'active' | 'completed' | 'abandoned';
+  daysCompleted: number;
+}
+
 export interface CyclePlan {
   contributionAmount: number;
   contributionPerPerson: number;

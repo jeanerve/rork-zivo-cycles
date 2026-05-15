@@ -7,6 +7,7 @@ import { StatusBar } from "expo-status-bar";
 import { AuthProvider, useAuth } from "@/providers/AuthProvider";
 import { CyclesProvider } from "@/providers/CyclesProvider";
 import { FeedProvider } from "@/providers/FeedProvider";
+import { ChallengesProvider } from "@/providers/ChallengesProvider";
 import { ThemeProvider, useTheme } from "@/providers/ThemeProvider";
 import { CardProvider } from "@/providers/CardProvider";
 import { SecurityProvider } from "@/providers/SecurityProvider";
@@ -88,6 +89,8 @@ function RootLayoutNav() {
         <Stack.Screen name="payment-methods" options={{ headerShown: false }} />
         <Stack.Screen name="card-customize" options={{ headerShown: false }} />
         <Stack.Screen name="security-setup" options={{ headerShown: false }} />
+        <Stack.Screen name="ai-assistant" options={{ headerShown: false, animation: "slide_from_right" }} />
+        <Stack.Screen name="challenges" options={{ headerShown: false, animation: "slide_from_right" }} />
         <Stack.Screen
           name="modal"
           options={{ presentation: "modal", headerShown: false }}
@@ -107,11 +110,13 @@ export default function RootLayout() {
           <AuthProvider>
             <CyclesProvider>
               <FeedProvider>
-                <CardProvider>
-                  <SecurityProvider>
-                    <RootLayoutNav />
-                  </SecurityProvider>
-                </CardProvider>
+                <ChallengesProvider>
+                  <CardProvider>
+                    <SecurityProvider>
+                      <RootLayoutNav />
+                    </SecurityProvider>
+                  </CardProvider>
+                </ChallengesProvider>
               </FeedProvider>
             </CyclesProvider>
           </AuthProvider>

@@ -3,13 +3,14 @@ import { View, Text, StyleSheet, ScrollView, Animated, TouchableOpacity, Refresh
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
-import { Plus, Flame, Lock, Clock, Users, Target, ChevronRight, Calendar, Trophy, Zap, ArrowUpRight, BarChart3 } from 'lucide-react-native';
+import { Plus, Flame, Lock, Clock, Users, Target, ChevronRight, Calendar, Trophy, Zap, ArrowUpRight, BarChart3, Swords } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import { useTheme } from '@/providers/ThemeProvider';
 import { useCycles } from '@/providers/CyclesProvider';
 import { useAuth } from '@/providers/AuthProvider';
 import GrowthGraph from '@/components/GrowthGraph';
 import AnimatedProgressBar from '@/components/AnimatedProgressBar';
+import AIInsightCard from '@/components/AIInsightCard';
 import { GraphDataPoint, Contribution, Cycle } from '@/types';
 
 function buildUserOnlyGraphData(cycles: { contributions: Contribution[] }[], userId: string): GraphDataPoint[] {
@@ -144,6 +145,29 @@ export default function HomeScreen() {
               )}
             </TouchableOpacity>
           </View>
+
+          <AIInsightCard />
+
+          <TouchableOpacity
+            style={[styles.challengesEntry, { backgroundColor: colors.card, borderColor: colors.cardBorder }]}
+            onPress={() => {
+              void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              router.push('/challenges');
+            }}
+            activeOpacity={0.85}
+            testID="challenges-entry"
+          >
+            <View style={[styles.challengesIconWrap, { backgroundColor: colors.greenMuted, borderColor: colors.green + '25' }]}>
+              <Swords size={16} color={colors.green} />
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text style={[styles.challengesTitle, { color: colors.text }]}>Community Challenges</Text>
+              <Text style={[styles.challengesDesc, { color: colors.textMuted }]} numberOfLines={1}>
+                Join others saving together — No-Spend, Daily $5, Emergency Fund
+              </Text>
+            </View>
+            <ChevronRight size={16} color={colors.textMuted} />
+          </TouchableOpacity>
 
           <View style={[styles.graphCard, { backgroundColor: colors.card, borderColor: colors.cardBorder }]}>
             <GrowthGraph
@@ -839,6 +863,31 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   smallCycleDays: {
+    fontSize: 12,
+  },
+  challengesEntry: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    padding: 14,
+    borderRadius: 16,
+    borderWidth: 1,
+    marginBottom: 12,
+  },
+  challengesIconWrap: {
+    width: 40,
+    height: 40,
+    borderRadius: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+  },
+  challengesTitle: {
+    fontSize: 14,
+    fontWeight: '700' as const,
+    marginBottom: 2,
+  },
+  challengesDesc: {
     fontSize: 12,
   },
 });
