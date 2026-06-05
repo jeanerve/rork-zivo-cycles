@@ -97,7 +97,7 @@ export default function ProfileScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const { user, logOut, updateAvatar } = useAuth();
-  const { activeCycles, cycles, totalSaved: _totalSaved, getDisciplineInfo } = useCycles();
+  const { activeCycles, cycles, completedCycles, totalSaved: _totalSaved, getDisciplineInfo } = useCycles();
   const { colors } = useTheme();
   const { settings: cardSettings, currentTheme, toggleCardLock } = useCard();
   const fadeAnim = useRef(new Animated.Value(0)).current;
