@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Animated, Alert, 
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
-import { Settings, ChevronRight, LogOut, HelpCircle, Layers, FileText, Building2, ShieldAlert, Star, Flame, Trophy, Shield, Bell, Lock, Unlock, Palette, Wifi, Camera, BadgeCheck } from 'lucide-react-native';
+import { Settings, ChevronRight, LogOut, HelpCircle, Layers, FileText, Building2, ShieldAlert, Star, Flame, Trophy, Shield, Bell, Lock, Unlock, Palette, Wifi, Camera, BadgeCheck, CreditCard, Target, ShieldBan } from 'lucide-react-native';
 import * as ImagePicker from 'expo-image-picker';
 import * as Haptics from 'expo-haptics';
 import { useTheme } from '@/providers/ThemeProvider';
@@ -336,23 +336,16 @@ export default function ProfileScreen() {
                 <BadgeItem key={badge.id} badge={badge} colors={colors} />
               ))}
             </View>
-            {allBadgesEarned && (
-              <View style={[styles.verifiedBanner, { backgroundColor: colors.greenMuted, borderColor: colors.green + '33' }]}>
-                <View style={[styles.verifiedIconWrap, { backgroundColor: colors.green + '22' }]}>
-                  <BadgeCheck size={22} color={colors.green} />
-                </View>
-                <View style={styles.verifiedContent}>
-                  <Text style={[styles.verifiedTitle, { color: colors.green }]}>Verified Account</Text>
-                  <Text style={[styles.verifiedDesc, { color: colors.textSecondary }]}>All achievements unlocked</Text>
-                </View>
-              </View>
-            )}
-            {!allBadgesEarned && (
-              <View style={[styles.verifiedHint, { borderColor: colors.cardBorder }]}>
-                <BadgeCheck size={16} color={colors.textMuted} />
-                <Text style={[styles.verifiedHintText, { color: colors.textMuted }]}>Complete all achievements to earn a verified badge</Text>
-              </View>
-            )}
+          </View>
+
+          <View style={styles.verificationSection}>
+            <Text style={[styles.achievementsTitle, { color: colors.textMuted }]}>VERIFICATION</Text>
+            <View style={styles.verifBadgesGrid}>
+              <VerifBadge icon="id" label="Identity" earned={false} colors={colors} />
+              <VerifBadge icon="bank" label="Bank" earned={false} colors={colors} />
+              <VerifBadge icon="saver" label="Saver" earned={allBadgesEarned} colors={colors} />
+              <VerifBadge icon="elite" label="Elite" earned={(completedCycles?.length ?? 0) >= 10} colors={colors} />
+            </View>
           </View>
 
           <View style={[styles.zivoCard, { backgroundColor: currentTheme.primary, borderColor: currentTheme.accent }]}>
@@ -442,7 +435,7 @@ export default function ProfileScreen() {
             <MenuItem
               icon={<HelpCircle size={18} color={colors.textSecondary} />}
               label="Help & Support"
-              subtitle="AI Assistant, Live Chat"
+              subtitle="Get help with your account"
               onPress={() => handleNav('/support')}
               colors={colors}
             />
@@ -472,6 +465,40 @@ export default function ProfileScreen() {
     </View>
   );
 }
+
+function VerifBadge({ icon, label, earned, colors }: { icon: string; label: string; earned: boolean; colors: ReturnType<typeof useTheme>['colors'] }) {
+  const getIcon = () => {
+    const c = earned ? colors.green : colors.textMuted;
+    switch (icon) {
+      case 'id': return <Shield size={18} color={c} />;
+      case 'bank': return <CreditCard size={18} color={c} />;
+      case 'saver': return <BadgeCheck size={18} color={c} />;
+      case 'elite': return <Trophy size={18} color={c} />;
+      default: return <Shield size={18} color={c} />;
+    }
+  };
+  return (
+    <View style={verifBadgeStyles.item}>
+      <View style={[
+        verifBadgeStyles.icon,
+        earned
+          ? { backgroundColor: colors.greenMuted, borderColor: colors.green + '33', borderWidth: 1 }
+          : { backgroundColor: colors.surfaceLight, borderColor: colors.border, borderWidth: 1 }
+      ]}>
+        {getIcon()}
+      </View>
+      <Text style={[verifBadgeStyles.label, { color: earned ? colors.green : colors.textMuted }]}>{label}</Text>
+      {earned && <View style={[verifBadgeStyles.dot, { backgroundColor: colors.green }]} />}
+    </View>
+  );
+}
+
+const verifBadgeStyles = StyleSheet.create({
+  item: { alignItems: 'center', gap: 6 },
+  icon: { width: 44, height: 44, borderRadius: 14, alignItems: 'center', justifyContent: 'center' },
+  label: { fontSize: 10, fontWeight: '600' as const },
+  dot: { width: 5, height: 5, borderRadius: 3 },
+});
 
 function MenuItem({ icon, label, subtitle, onPress, colors }: { icon: React.ReactNode; label: string; subtitle?: string; onPress: () => void; colors: ReturnType<typeof useTheme>['colors'] }) {
   return (
@@ -897,5 +924,13 @@ const styles = StyleSheet.create({
   verifiedHintText: {
     fontSize: 12,
     flex: 1,
+  },
+  verificationSection: {
+    marginBottom: 24,
+  },
+  verifBadgesGrid: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 14,
   },
 });

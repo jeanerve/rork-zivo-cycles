@@ -2,7 +2,7 @@ import React, { useRef, useEffect, useCallback } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Animated, Alert, Switch } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { ArrowLeft, Bell, Lock, Shield, Smartphone, Globe, ChevronRight, Sun, Moon, Fingerprint } from 'lucide-react-native';
+import { ArrowLeft, Bell, Lock, Shield, Smartphone, Globe, ChevronRight, Sun, Moon, Fingerprint, Bot, BadgeCheck, CreditCard, Target, ShieldBan } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import { useTheme } from '@/providers/ThemeProvider';
 import { useAuth } from '@/providers/AuthProvider';
@@ -159,6 +159,53 @@ export default function SettingsScreen() {
             </TouchableOpacity>
           </View>
 
+          <Text style={[styles.sectionTitle, { color: colors.textMuted }]}>Zivo AI</Text>
+          <View style={[styles.settingCard, { backgroundColor: colors.card, borderColor: colors.cardBorder }]}>
+            <TouchableOpacity
+              style={styles.settingRow}
+              onPress={() => router.push('/ai-assistant')}
+              activeOpacity={0.7}
+            >
+              <View style={[styles.settingIcon, { backgroundColor: colors.greenMuted }]}>
+                <Bot size={16} color={colors.green} />
+              </View>
+              <View style={styles.settingInfo}>
+                <Text style={[styles.settingLabel, { color: colors.text }]}>Zivo AI Assistant</Text>
+                <Text style={[styles.settingDesc, { color: colors.textMuted }]}>Personalized saving insights</Text>
+              </View>
+              <ChevronRight size={16} color={colors.textMuted} />
+            </TouchableOpacity>
+          </View>
+
+          <Text style={[styles.sectionTitle, { color: colors.textMuted }]}>Verification</Text>
+          <View style={[styles.settingCard, { backgroundColor: colors.card, borderColor: colors.cardBorder }]}>
+            <View style={styles.settingRow}>
+              <View style={[styles.settingIcon, { backgroundColor: colors.blueMuted }]}>
+                <BadgeCheck size={16} color={colors.blue} />
+              </View>
+              <View style={styles.settingInfo}>
+                <Text style={[styles.settingLabel, { color: colors.text }]}>Verified Identity</Text>
+                <Text style={[styles.settingDesc, { color: colors.textMuted }]}>Government ID verification</Text>
+              </View>
+              <View style={[styles.badgeOff, { backgroundColor: colors.surfaceLight }]}>
+                <Text style={[styles.badgeOffText, { color: colors.textMuted }]}>Setup</Text>
+              </View>
+            </View>
+            <View style={[styles.divider, { backgroundColor: colors.border }]} />
+            <View style={styles.settingRow}>
+              <View style={[styles.settingIcon, { backgroundColor: colors.tealMuted }]}>
+                <CreditCard size={16} color={colors.teal} />
+              </View>
+              <View style={styles.settingInfo}>
+                <Text style={[styles.settingLabel, { color: colors.text }]}>Verified Bank</Text>
+                <Text style={[styles.settingDesc, { color: colors.textMuted }]}>Connect your bank account</Text>
+              </View>
+              <View style={[styles.badgeOff, { backgroundColor: colors.surfaceLight }]}>
+                <Text style={[styles.badgeOffText, { color: colors.textMuted }]}>Connect</Text>
+              </View>
+            </View>
+          </View>
+
           <Text style={[styles.sectionTitle, { color: colors.textMuted }]}>Preferences</Text>
           <View style={[styles.settingCard, { backgroundColor: colors.card, borderColor: colors.cardBorder }]}>
             <TouchableOpacity style={styles.settingRow}>
@@ -204,6 +251,54 @@ export default function SettingsScreen() {
                 {user?.joinDate ? new Date(user.joinDate).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : 'N/A'}
               </Text>
             </View>
+          </View>
+
+          <Text style={[styles.sectionTitle, { color: colors.textMuted }]}>Card & Spending</Text>
+          <View style={[styles.settingCard, { backgroundColor: colors.card, borderColor: colors.cardBorder }]}>
+            <TouchableOpacity
+              style={styles.settingRow}
+              onPress={() => router.push('/card-experience')}
+              activeOpacity={0.7}
+            >
+              <View style={[styles.settingIcon, { backgroundColor: colors.greenMuted }]}>
+                <CreditCard size={16} color={colors.green} />
+              </View>
+              <View style={styles.settingInfo}>
+                <Text style={[styles.settingLabel, { color: colors.text }]}>Zivo Card</Text>
+                <Text style={[styles.settingDesc, { color: colors.textMuted }]}>Manage your virtual card</Text>
+              </View>
+              <ChevronRight size={16} color={colors.textMuted} />
+            </TouchableOpacity>
+            <View style={[styles.divider, { backgroundColor: colors.border }]} />
+            <TouchableOpacity
+              style={styles.settingRow}
+              onPress={() => router.push('/spending-categories')}
+              activeOpacity={0.7}
+            >
+              <View style={[styles.settingIcon, { backgroundColor: colors.orangeMuted }]}>
+                <ShieldBan size={16} color={colors.orange} />
+              </View>
+              <View style={styles.settingInfo}>
+                <Text style={[styles.settingLabel, { color: colors.text }]}>Spending Categories</Text>
+                <Text style={[styles.settingDesc, { color: colors.textMuted }]}>Lock categories by budget</Text>
+              </View>
+              <ChevronRight size={16} color={colors.textMuted} />
+            </TouchableOpacity>
+            <View style={[styles.divider, { backgroundColor: colors.border }]} />
+            <TouchableOpacity
+              style={styles.settingRow}
+              onPress={() => router.push('/round-ups')}
+              activeOpacity={0.7}
+            >
+              <View style={[styles.settingIcon, { backgroundColor: colors.tealMuted }]}>
+                <Target size={16} color={colors.teal} />
+              </View>
+              <View style={styles.settingInfo}>
+                <Text style={[styles.settingLabel, { color: colors.text }]}>Round Ups</Text>
+                <Text style={[styles.settingDesc, { color: colors.textMuted }]}>Save spare change automatically</Text>
+              </View>
+              <ChevronRight size={16} color={colors.textMuted} />
+            </TouchableOpacity>
           </View>
 
           <TouchableOpacity
@@ -328,5 +423,14 @@ const styles = StyleSheet.create({
     fontSize: 12,
     textAlign: 'center',
     marginTop: 20,
+  },
+  badgeOff: {
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 8,
+  },
+  badgeOffText: {
+    fontSize: 11,
+    fontWeight: '700' as const,
   },
 });

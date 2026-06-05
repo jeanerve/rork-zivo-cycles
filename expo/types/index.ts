@@ -189,6 +189,89 @@ export interface DisciplineInfo {
 
 export type InsightType = 'streak' | 'milestone' | 'spending' | 'encouragement' | 'tip' | 'goal';
 
+export type VerificationType = 'identity' | 'bank' | 'saver' | 'elite';
+
+export interface VerificationBadge {
+  type: VerificationType;
+  label: string;
+  icon: string;
+  description: string;
+  earned: boolean;
+  earnedDate?: string;
+}
+
+export type SpendingCategoryType = 'food' | 'shopping' | 'entertainment' | 'lifestyle' | 'gaming' | 'transport' | 'other';
+
+export interface SpendingCategory {
+  id: string;
+  type: SpendingCategoryType;
+  label: string;
+  emoji: string;
+  monthlyBudget: number;
+  currentSpend: number;
+  isLocked: boolean;
+  lockedAt?: string;
+  autoLock: boolean;
+}
+
+export interface RoundUpSettings {
+  enabled: boolean;
+  destination: 'active_cycle' | 'milestone_goal' | 'savings';
+  cycleId?: string;
+  totalRounded: number;
+}
+
+export interface CardDetails {
+  cardNumber: string;
+  last4: string;
+  cvv: string;
+  expiryMonth: string;
+  expiryYear: string;
+  cardholderName: string;
+  addedToWallet: boolean;
+}
+
+export interface BoostRecord {
+  id: string;
+  fromUserId: string;
+  fromUserName: string;
+  fromUserAvatar: string;
+  toUserId: string;
+  toUserName: string;
+  amount: number;
+  milestone: string;
+  message?: string;
+  createdAt: string;
+}
+
+export type CycleHealthFactor = 'on_time_payments' | 'streak' | 'missed_payments' | 'goal_completion' | 'challenge_participation';
+
+export interface CycleHealth {
+  score: number;
+  label: string;
+  factors: { factor: CycleHealthFactor; score: number; label: string }[];
+}
+
+export interface ChallengeMember {
+  id: string;
+  name: string;
+  avatar: string;
+  streak: number;
+  amountSaved: number;
+  rank: number;
+  daysRemaining: number;
+  verificationBadges: VerificationType[];
+}
+
+export interface ChallengeDashboard {
+  challengeId: string;
+  members: ChallengeMember[];
+  rules: string[];
+  potSize: number;
+  totalDays: number;
+  daysRemaining: number;
+}
+
 export interface AIInsight {
   id: string;
   text: string;
@@ -220,6 +303,10 @@ export interface UserChallenge {
   progress: number;
   status: 'active' | 'completed' | 'abandoned';
   daysCompleted: number;
+}
+
+export interface ChallengeWithDashboard extends Challenge {
+  dashboard?: ChallengeDashboard;
 }
 
 export interface CyclePlan {

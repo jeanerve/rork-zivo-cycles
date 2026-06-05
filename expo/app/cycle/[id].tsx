@@ -632,6 +632,60 @@ export default function CycleDetailScreen() {
             </View>
           )}
 
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <Sparkles size={16} color={typeColor} />
+              <Text style={[styles.sectionTitle, { color: colors.text }]}>Cycle Health</Text>
+            </View>
+            <View style={[styles.healthCard, { backgroundColor: colors.card, borderColor: colors.cardBorder }]}>
+              <View style={styles.healthScoreRow}>
+                <View style={[styles.healthScoreCircle, {
+                  borderColor: completionRate >= 90 ? colors.green : completionRate >= 70 ? colors.warning : colors.danger,
+                }]}>
+                  <Text style={[styles.healthScoreNum, {
+                    color: completionRate >= 90 ? colors.green : completionRate >= 70 ? colors.warning : colors.danger,
+                  }]}>{completionRate}</Text>
+                  <Text style={[styles.healthScoreDenom, { color: colors.textMuted }]}>/100</Text>
+                </View>
+                <View style={styles.healthInfo}>
+                  <Text style={[styles.healthLabel, {
+                    color: completionRate >= 90 ? colors.green : completionRate >= 70 ? colors.warning : colors.danger,
+                  }]}>
+                    {completionRate >= 90 ? 'Excellent Discipline' : completionRate >= 70 ? 'Good Standing' : 'Needs Attention'}
+                  </Text>
+                  <Text style={[styles.healthDesc, { color: colors.textSecondary }]}>
+                    Based on on-time payments, current streak, missed contributions, and goal completion
+                  </Text>
+                </View>
+              </View>
+              <View style={[styles.healthDivider, { backgroundColor: colors.border }]} />
+              <View style={styles.healthFactors}>
+                <View style={styles.healthFactor}>
+                  <View style={[styles.healthFactorDot, { backgroundColor: colors.green }]} />
+                  <Text style={[styles.healthFactorLabel, { color: colors.textSecondary }]}>On Time</Text>
+                  <Text style={[styles.healthFactorVal, { color: colors.text }]}>
+                    {disciplineInfo.onTimeCount}/{disciplineInfo.totalPayments}
+                  </Text>
+                </View>
+                <View style={styles.healthFactor}>
+                  <View style={[styles.healthFactorDot, { backgroundColor: colors.warning }]} />
+                  <Text style={[styles.healthFactorLabel, { color: colors.textSecondary }]}>Missed</Text>
+                  <Text style={[styles.healthFactorVal, { color: colors.text }]}>{missedDays}</Text>
+                </View>
+                <View style={styles.healthFactor}>
+                  <View style={[styles.healthFactorDot, { backgroundColor: colors.blue }]} />
+                  <Text style={[styles.healthFactorLabel, { color: colors.textSecondary }]}>Streak</Text>
+                  <Text style={[styles.healthFactorVal, { color: colors.text }]}>{user?.streak ?? 0}d</Text>
+                </View>
+                <View style={styles.healthFactor}>
+                  <View style={[styles.healthFactorDot, { backgroundColor: colors.purple }]} />
+                  <Text style={[styles.healthFactorLabel, { color: colors.textSecondary }]}>Goal</Text>
+                  <Text style={[styles.healthFactorVal, { color: colors.text }]}>{Math.round(progress * 100)}%</Text>
+                </View>
+              </View>
+            </View>
+          </View>
+
           {(cycle.members.length > 1 || isGroupCycle) && (
             <View style={styles.section}>
               <View style={styles.sectionHeaderRow}>
@@ -1588,5 +1642,70 @@ const styles = StyleSheet.create({
   breakdownText: {
     fontSize: 11,
     fontWeight: '500' as const,
+  },
+  healthCard: {
+    borderRadius: 16,
+    padding: 16,
+    borderWidth: 1,
+  },
+  healthScoreRow: {
+    flexDirection: 'row' as const,
+    alignItems: 'center' as const,
+    gap: 16,
+    marginBottom: 12,
+  },
+  healthScoreCircle: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    borderWidth: 3,
+    alignItems: 'center' as const,
+    justifyContent: 'center' as const,
+  },
+  healthScoreNum: {
+    fontSize: 22,
+    fontWeight: '800' as const,
+  },
+  healthScoreDenom: {
+    fontSize: 10,
+    fontWeight: '600' as const,
+    marginTop: -2,
+  },
+  healthInfo: {
+    flex: 1,
+  },
+  healthLabel: {
+    fontSize: 15,
+    fontWeight: '700' as const,
+    marginBottom: 4,
+  },
+  healthDesc: {
+    fontSize: 12,
+    lineHeight: 17,
+  },
+  healthDivider: {
+    height: 1,
+    marginBottom: 12,
+  },
+  healthFactors: {
+    flexDirection: 'row' as const,
+    justifyContent: 'space-between' as const,
+  },
+  healthFactor: {
+    alignItems: 'center' as const,
+    gap: 4,
+  },
+  healthFactorDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+  },
+  healthFactorLabel: {
+    fontSize: 10,
+    fontWeight: '600' as const,
+  },
+  healthFactorVal: {
+    fontSize: 14,
+    fontWeight: '800' as const,
   },
 });
