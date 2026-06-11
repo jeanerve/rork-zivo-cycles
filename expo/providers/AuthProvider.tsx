@@ -47,14 +47,6 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
     },
   });
 
-  useEffect(() => {
-    if (authQuery.data) {
-      setIsAuthenticated(authQuery.data.isAuthenticated);
-      setUser(authQuery.data.user);
-      setIsReady(true);
-    }
-  }, [authQuery.data]);
-
   const saveSession = useMutation({
     mutationFn: async (data: { email: string | null; isAuthenticated: boolean }) => {
       const session: StoredSession = { isAuthenticated: data.isAuthenticated, email: data.email };
@@ -69,9 +61,30 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
     },
   });
 
-  const recordSignupToSupabase = useCallback(async () => {
+  const hashEmail = useCallback((email: string): string => {
+    let hash = 0;
+    const normalized = email.toLowerCase().trim();
+    for (let i = 0; i < normalized.length; i++) {
+      const char = normalized.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash;
+    }
+    return 'u' + Math.abs(hash).toString(36);
+  }, []);
+
+  const recordSignupToSupabase = useCallback(async (email: string) => {
     try {
-      const { error } = await supabase.from('user_signups').insert({});
+      const emailHash = hashEmail(email);
+      const { data: existing } = await supabase
+        .from('user_signups')
+        .select('id')
+        .eq('user_email_hash', emailHash)
+        .limit(1);
+      if (existing && existing.length > 0) {
+        console.log('[Auth] User already recorded in Supabase');
+        return;
+      }
+      const { error } = await supabase.from('user_signups').insert({ user_email_hash: emailHash });
       if (error) {
         console.log('[Auth] Supabase signup record skipped:', error.message);
       } else {
@@ -80,7 +93,7 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
     } catch (e) {
       console.log('[Auth] Supabase unreachable — signup tracked locally only');
     }
-  }, []);
+  }, [hashEmail]);
 
   const signUp = useCallback((params: {
     name: string;
@@ -115,7 +128,7 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
     setIsAuthenticated(true);
     saveUserData.mutate(newUser);
     saveSession.mutate({ email, isAuthenticated: true });
-    void recordSignupToSupabase();
+    void recordSignupToSupabase(email);
     return newUser;
   }, [saveUserData, saveSession, recordSignupToSupabase]);
 
@@ -155,9 +168,7 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
     setUser(userData);
     setIsAuthenticated(true);
     saveSession.mutate({ email, isAuthenticated: true });
-    if (isNewUser) {
-      void recordSignupToSupabase();
-    }
+    void recordSignupToSupabase(email);
     return userData;
   }, [saveSession, recordSignupToSupabase]);
 
@@ -232,6 +243,17 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
     setUser(updated);
     saveUserData.mutate(updated);
   }, [user, saveUserData]);
+
+  useEffect(() => {
+    if (authQuery.data) {
+      setIsAuthenticated(authQuery.data.isAuthenticated);
+      setUser(authQuery.data.user);
+      setIsReady(true);
+      if (authQuery.data.isAuthenticated && authQuery.data.user) {
+        void recordSignupToSupabase(authQuery.data.user.email);
+      }
+    }
+  }, [authQuery.data, recordSignupToSupabase]);
 
   return useMemo(() => ({
     isAuthenticated,
