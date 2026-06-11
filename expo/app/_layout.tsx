@@ -91,6 +91,10 @@ function RootLayoutNav() {
         <Stack.Screen name="security-setup" options={{ headerShown: false }} />
         <Stack.Screen name="ai-assistant" options={{ headerShown: false, animation: "slide_from_right" }} />
         <Stack.Screen name="challenges" options={{ headerShown: false, animation: "slide_from_right" }} />
+        <Stack.Screen name="challenge-dashboard" options={{ headerShown: false, animation: "slide_from_right" }} />
+        <Stack.Screen name="card-experience" options={{ headerShown: false, animation: "slide_from_right" }} />
+        <Stack.Screen name="spending-categories" options={{ headerShown: false, animation: "slide_from_right" }} />
+        <Stack.Screen name="round-ups" options={{ headerShown: false, animation: "slide_from_right" }} />
         <Stack.Screen
           name="modal"
           options={{ presentation: "modal", headerShown: false }}
