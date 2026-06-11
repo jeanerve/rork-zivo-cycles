@@ -3,7 +3,8 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Animated, Alert, 
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
-import { Settings, ChevronRight, LogOut, HelpCircle, Layers, FileText, Building2, ShieldAlert, Star, Flame, Trophy, Shield, Bell, Lock, Unlock, Palette, Wifi, Camera, BadgeCheck, CreditCard, Target, ShieldBan } from 'lucide-react-native';
+import { useQuery } from '@tanstack/react-query';
+import { Settings, ChevronRight, LogOut, HelpCircle, Layers, FileText, Building2, ShieldAlert, Star, Flame, Trophy, Shield, Bell, Lock, Unlock, Palette, Wifi, Camera, BadgeCheck, CreditCard, Target, ShieldBan, Users } from 'lucide-react-native';
 import * as ImagePicker from 'expo-image-picker';
 import * as Haptics from 'expo-haptics';
 import { useTheme } from '@/providers/ThemeProvider';
@@ -12,6 +13,7 @@ import { useCycles } from '@/providers/CyclesProvider';
 import { useCard } from '@/providers/CardProvider';
 import { Badge } from '@/types';
 import AnimatedProgressBar from '@/components/AnimatedProgressBar';
+import { supabase } from '@/lib/supabase';
 
 function getBadgeIcon(iconName: string, earned: boolean, colors: { green: string; textMuted: string }) {
   const color = earned ? colors.green : colors.textMuted;
@@ -101,6 +103,22 @@ export default function ProfileScreen() {
   const { colors } = useTheme();
   const { settings: cardSettings, currentTheme, toggleCardLock } = useCard();
   const fadeAnim = useRef(new Animated.Value(0)).current;
+
+  const userCountQuery = useQuery({
+    queryKey: ['zivo-user-count'],
+    queryFn: async () => {
+      const { count, error } = await supabase
+        .from('user_signups')
+        .select('*', { count: 'exact', head: true });
+      if (error) {
+        console.log('[Profile] Failed to fetch user count:', error.message);
+        return 0;
+      }
+      return count ?? 0;
+    },
+    staleTime: 60_000,
+  });
+  const totalUsers = userCountQuery.data ?? 0;
 
   useEffect(() => {
     Animated.timing(fadeAnim, { toValue: 1, duration: 500, useNativeDriver: true }).start();
@@ -275,6 +293,20 @@ export default function ProfileScreen() {
               }]}>{disciplineInfo.score}%</Text>
             </View>
           </View>
+
+          {totalUsers > 0 && (
+            <View style={[styles.communityCard, { backgroundColor: colors.card, borderColor: colors.cardBorder }]}>
+              <View style={[styles.communityIconWrap, { backgroundColor: colors.greenMuted }]}>
+                <Users size={20} color={colors.green} />
+              </View>
+              <View style={styles.communityContent}>
+                <Text style={[styles.communityCount, { color: colors.green }]}>{totalUsers.toLocaleString()}</Text>
+                <Text style={[styles.communityLabel, { color: colors.textMuted }]}>
+                  {totalUsers === 1 ? 'person using Zivo' : 'people using Zivo'}
+                </Text>
+              </View>
+            </View>
+          )}
 
           <View style={[styles.disciplineDetailCard, { backgroundColor: colors.card, borderColor: colors.cardBorder }]}>
             <View style={styles.disciplineDetailHeader}>
@@ -671,6 +703,34 @@ const styles = StyleSheet.create({
   statCardValue: {
     fontSize: 22,
     fontWeight: '800' as const,
+  },
+  communityCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderRadius: 16,
+    padding: 16,
+    borderWidth: 1,
+    marginBottom: 24,
+    gap: 14,
+  },
+  communityIconWrap: {
+    width: 48,
+    height: 48,
+    borderRadius: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  communityContent: {
+    flex: 1,
+  },
+  communityCount: {
+    fontSize: 22,
+    fontWeight: '800' as const,
+  },
+  communityLabel: {
+    fontSize: 13,
+    fontWeight: '500' as const,
+    marginTop: 2,
   },
   achievementsSection: {
     marginBottom: 24,

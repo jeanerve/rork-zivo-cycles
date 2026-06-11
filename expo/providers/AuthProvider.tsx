@@ -4,6 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import createContextHook from '@nkzw/create-context-hook';
 import { UserProfile, PaymentMethod, AccountType } from '@/types';
 import { MOCK_BADGES } from '@/mocks/data';
+import { supabase } from '@/lib/supabase';
 
 const AUTH_SESSION_KEY = 'zivo_current_session';
 function userStorageKey(email: string): string {
@@ -68,6 +69,19 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
     },
   });
 
+  const recordSignupToSupabase = useCallback(async () => {
+    try {
+      const { error } = await supabase.from('user_signups').insert({});
+      if (error) {
+        console.log('[Auth] Supabase signup record skipped:', error.message);
+      } else {
+        console.log('[Auth] Signup recorded in Supabase');
+      }
+    } catch (e) {
+      console.log('[Auth] Supabase unreachable — signup tracked locally only');
+    }
+  }, []);
+
   const signUp = useCallback((params: {
     name: string;
     email: string;
@@ -101,8 +115,9 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
     setIsAuthenticated(true);
     saveUserData.mutate(newUser);
     saveSession.mutate({ email, isAuthenticated: true });
+    void recordSignupToSupabase();
     return newUser;
-  }, [saveUserData, saveSession]);
+  }, [saveUserData, saveSession, recordSignupToSupabase]);
 
   const logIn = useCallback(async (params: { email: string; password: string }) => {
     const email = params.email.toLowerCase().trim();
@@ -110,11 +125,13 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
 
     const existingRaw = await AsyncStorage.getItem(userStorageKey(email));
     let userData: UserProfile;
+    let isNewUser = false;
 
     if (existingRaw) {
       userData = JSON.parse(existingRaw) as UserProfile;
       console.log('[Auth] Found existing user:', userData.name);
     } else {
+      isNewUser = true;
       const userId = `user-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`;
       userData = {
         id: userId,
@@ -138,8 +155,11 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
     setUser(userData);
     setIsAuthenticated(true);
     saveSession.mutate({ email, isAuthenticated: true });
+    if (isNewUser) {
+      void recordSignupToSupabase();
+    }
     return userData;
-  }, [saveSession]);
+  }, [saveSession, recordSignupToSupabase]);
 
   const logOut = useCallback(async () => {
     console.log('[Auth] Logging out, clearing session...');
